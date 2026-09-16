@@ -1,0 +1,42 @@
+#!/bin/zsh
+
+# IMPORTANT: This script needs to be `chmod +x` for it to be recognised
+#            as a script rather than a plain automounter map file.
+
+# The list of NFS shares allowed to be automounted:
+EXPORTS=(
+  projects
+  pictures
+  video
+  music
+  home
+)
+
+# The IP address and the NFS server path
+PREFIX="192.168.0.100:/mnt/myraid"
+
+# Options for NFS mounting; these defaults works for me, using TrueNAS 25.04:
+OPTS="-fstype=nfs,vers=4.2,nfc,nolocallocks,rw,soft,intr,resvport,actimeo=1"
+
+if [[ $# -lt 1 ]]; then
+  # When no param is passed, `auto_nfs` should return a list of possible shares
+  # to mount; I'm not sure how this interacts with `-nobrowse` in `/etc/auto_master`
+  for f in $EXPORTS; do
+    echo $f
+  done
+
+else
+  # When called with one param, it's the name of the NFS share that's being
+  # requested, so generate a automounter map line. 
+  KEY="$1"
+  
+  # For current macOS (Golden Gate) the actual path for `/nfs` is `/System/Volumes/Data/nfs`,
+  # and the map line is defined relative to `/System/Volumes/Data/nfs/$KEY`.  So, a "mount
+  # point" of `/` indicates to mount the share exactly at `/System/Volumes/Data/nfs/$KEY`
+  
+  # If $KEY is in our list of exports, then allow it
+  if [[ " ${EXPORTS[@]} " == *" $KEY "* ]]; then
+      # Output "/  -fstype=nfs,resvport,rw,…   192.168.0.100:/mnt/myraid/$KEY"
+      echo "/\t$OPTS\t$PREFIX/$KEY"
+  fi
+fi
