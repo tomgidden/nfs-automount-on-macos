@@ -1,15 +1,16 @@
 #
 # Automounter master map
 #
-##+auto_master		# Use directory service
+
+# The default map:
+
++auto_master		# Use directory service
 #/net			-hosts		-nobrowse,hidefromfinder,nosuid
-##/home			auto_home	-nobrowse,hidefromfinder
-##/Network/Servers	-fstab
-##/-			-static
+/home			auto_home	-nobrowse,hidefromfinder
+/Network/Servers	-fstab
+/-			-static
 
-## Entries with ## above are enabled by default, but I don't need
-## them -- who does nowadays? -- so have disabled them.
-
-# Remove `nobrowse` if you want to autocomplete /nfs/…
 
 /nfs                    auto_nfs	-nobrowse,hidefromfinder,nosuid
+
+# Remove `nobrowse` if you want to autocomplete /nfs/…
