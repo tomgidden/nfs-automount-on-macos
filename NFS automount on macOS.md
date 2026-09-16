@@ -12,4 +12,20 @@ configurable features of Samba (eg. being able to veto files like `._*` and
 
 For the server I'm using TrueNAS 25.04 with my main RAID-Z3 exported on `/mnt/raid1`
 
+## Installation
 
+1. Edit `etc__auto_nfs` to taste
+2. `sudo install -m 700 -o root etc__auto_nfs /etc/auto_nfs`
+3. `sudo dscl . -create "/Automount/\/nfs"
+4. `sudo dscl . -create "/Automount/\/nfs" 'dsAttrTypeStandard:MetaAutomountMap' auto_master`
+5. `sudo dscl . -create "/Automount/\/nfs" AutomountInformation "auto_nfs -nobrowse,hidefromfinder,nosuid"`
+
+and if you're adding the optional synthetics:
+1. `sudo install -m 644 -o root -d etc__synthetic.d__shortcuts.conf /etc/synthetic.d/shortcuts.conf`
+2. `/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t`
+
+## History
+
+[An earlier revision of this Gist](https://gist.github.com/tomgidden/1bf13ce0c5e4cf234c4fd6505031839a/2bc2ebc5eba7fcff229e3ce73f54285075b02db4) edited the `/etc/auto_master` file directly, which works, but then requires re-patching after OS updates.  [feoh/macos-nas-automount](https://github.com/feoh/macos-nas-automount) uses a Directory Services approach using the main `+auto_master` map instead, which I've adopted in the instructions above.
+
+That repo might be more useful for what you're trying to achieve, by the way, but my approach is more suitable for my purposes, albeit improved by borrowing the `dscl` commands!
